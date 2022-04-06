@@ -3,10 +3,20 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { SWRConfig } from 'swr';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <SWRConfig
+      value={{
+        fetcher: (...args) => fetch(...args).then(res => res.json()),
+        dedupingInterval: 2000,
+        revalidateOnFocus: true,
+        refreshInterval: 0,
+      }}
+    >
+      <App />
+    </SWRConfig>
   </React.StrictMode>,
   document.getElementById('root')
 );

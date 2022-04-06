@@ -1,39 +1,24 @@
-import React, { useEffect, useState } from 'react';
+import useSWR from 'swr';
 
 export default function Users() {
-  const [users, setUsers] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [usersError, setUsersError] = useState(null);
+  const {
+    data: users,
+    error,
+    mutate,
+  } = useSWR('http://playground-laravel-swr.test/api/users');
 
-  useEffect(() => {
-    console.log('Users component mounting');
-    setIsLoading(true);
-    fetch('http://playground-laravel-swr.test/api/users')
-      .then(response => response.json())
-      .then(result => {
-        setUsers(result);
-        console.log(result);
-      })
-      .catch(error => {
-        console.log('There was an error');
-        // console.log(error);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, []);
+  if (error) return <div>failed to load</div>;
+  if (!users) return <div>loading...</div>;
 
+  // render data
   return (
-    <div>
-      {isLoading ? (
-        <div>Loading...</div>
-      ) : (
-        <ul>
-          {users.map(user => (
-            <li key={user.id}>{user.name}</li>
-          ))}
-        </ul>
-      )}
-    </div>
+    <>
+      <button onClick={() => mutate()}>Re-fetch data</button>
+      <ul>
+        {users.map(user => (
+          <li key={user.id}>{user.name}</li>
+        ))}
+      </ul>
+    </>
   );
 }
